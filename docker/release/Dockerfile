@@ -7,6 +7,8 @@ FROM debian:stretch
 # explicitly set user/group IDs
 RUN groupadd -r freeswitch --gid=999 && useradd -r -g freeswitch --uid=999 freeswitch
 
+RUN apt-get update && apt-get install -y gnupg2 
+
 # grab gosu for easy step-down from root
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
@@ -28,8 +30,7 @@ RUN sed -i "s/stretch main/stretch main contrib non-free/" /etc/apt/sources.list
 
 # https://freeswitch.org/confluence/display/FREESWITCH/Debian+9+Stretch
 
-RUN apt-get update && apt-get install -y gnupg2 wget \
-    && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
+RUN wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
     && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ stretch main" > /etc/apt/sources.list.d/freeswitch.list \
     && echo "deb-src http://files.freeswitch.org/repo/deb/debian-release/ stretch main" >> /etc/apt/sources.list.d/freeswitch.list 
 
@@ -51,7 +52,6 @@ EXPOSE 5070/udp 5070/tcp
 EXPOSE 64535-65535/udp
 EXPOSE 16384-32768/udp
 
-
 # Volumes
 ## Freeswitch Configuration
 VOLUME ["/etc/freeswitch"]
@@ -59,7 +59,7 @@ VOLUME ["/etc/freeswitch"]
 VOLUME ["/tmp"]
 
 # Limits Configuration
-COPY    build/freeswitch.limits.conf /etc/security/limits.d/
+COPY build/freeswitch.limits.conf /etc/security/limits.d/
 
 # Healthcheck to make sure the service is running
 SHELL       ["/bin/bash"]
@@ -67,9 +67,6 @@ HEALTHCHECK --interval=15s --timeout=5s \
     CMD  fs_cli -x status | grep -q ^UP || exit 1
 
 ## Add additional things here
-
-##
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["freeswitch"]
