@@ -51,4 +51,4 @@ SHELL       ["/bin/bash"]
 HEALTHCHECK --interval=15s --timeout=5s \
     CMD  fs_cli -x status | grep -q ^UP || exit 1
 
-CMD ["freeswitch"]
+# CMD ["freeswitch"]
