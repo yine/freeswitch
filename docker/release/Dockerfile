@@ -7,7 +7,7 @@ FROM debian:stretch
 # explicitly set user/group IDs
 RUN groupadd -r freeswitch --gid=999 && useradd -r -g freeswitch --uid=999 freeswitch
 
-RUN apt-get update && apt-get install -y gnupg2 
+RUN apt-get update && apt-get install -y gnupg2 wget
 
 # grab gosu for easy step-down from root
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
