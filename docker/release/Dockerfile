@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM debian:jessie
+FROM debian:stretch
 
 # Source Dockerfile:
 # https://github.com/docker-library/postgres/blob/master/9.4/Dockerfile
@@ -22,20 +22,18 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
-# https://files.freeswitch.org/repo/deb/freeswitch-1.*/dists/jessie/main/binary-amd64/Packages
-
 ENV FS_MAJOR 1.6
 
-RUN sed -i "s/jessie main/jessie main contrib non-free/" /etc/apt/sources.list
+RUN sed -i "s/stretch main/stretch main contrib non-free/" /etc/apt/sources.list
 
-# https://freeswitch.org/confluence/display/FREESWITCH/Debian+8+Jessie#Debian8Jessie-InstallingfromDebianpackages
+# https://freeswitch.org/confluence/display/FREESWITCH/Debian+9+Stretch
 
-RUN apt-get update && apt-get install -y curl \
-    && curl https://files.freeswitch.org/repo/deb/debian/freeswitch_archive_g0.pub | apt-key add - \
-    && echo "deb http://files.freeswitch.org/repo/deb/freeswitch-$FS_MAJOR/ jessie main" > /etc/apt/sources.list.d/freeswitch.list \
-    && apt-get purge -y --auto-remove curl
+RUN apt-get update && apt-get install -y gnupg2 wget \
+    && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
+    && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ stretch main" > /etc/apt/sources.list.d/freeswitch.list \
+    && echo "deb-src http://files.freeswitch.org/repo/deb/debian-release/ stretch main" >> /etc/apt/sources.list.d/freeswitch.list 
 
-RUN apt-get update && apt-get install -y freeswitch-all \
+RUN apt-get update && apt-get install -y freeswitch-meta-all \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Clean up
